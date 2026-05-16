@@ -1,6 +1,7 @@
 import json
 import os
 import re
+from datetime import date
 from pathlib import Path
 from typing import Optional
 
@@ -177,10 +178,12 @@ async def tailor_cover(
 ) -> str:
     client = get_client()
     system = read_prompt("tailor_cover.md")
+    today = date.today().strftime("%B %d, %Y")  # e.g. "May 16, 2026"
     user = (
         f"BASE COVER LETTER:\n{base_cover}\n\n"
         f"COMPANY: {company}\n"
-        f"JOB TITLE: {job_title}\n\n"
+        f"JOB TITLE: {job_title}\n"
+        f"TODAY'S DATE: {today}\n\n"
         f"JOB DESCRIPTION:\n{jd}"
     )
     msg = await client.messages.create(

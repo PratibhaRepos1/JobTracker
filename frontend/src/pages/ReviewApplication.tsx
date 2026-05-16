@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
-import TailoredPreview from "../components/TailoredPreview";
+import ChangesSummary from "../components/ChangesSummary";
+import TailoredPreview, { type TailoredTab } from "../components/TailoredPreview";
 import {
   createApplication,
   downloadUrl,
@@ -73,6 +74,7 @@ export default function ReviewApplication() {
 
   const [resumeMd, setResumeMd] = useState("");
   const [coverMd, setCoverMd] = useState("");
+  const [tab, setTab] = useState<TailoredTab>("resume");
 
   useEffect(() => {
     if (source.tailored) {
@@ -131,36 +133,48 @@ export default function ReviewApplication() {
   const warning = source.tailored.warning;
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
+    <div className="space-y-6">
+      <div className="flex items-start justify-between gap-4 flex-wrap bg-white rounded-xl border border-slate-200 shadow-md p-6">
         <div>
-          <h1 className="text-xl font-semibold text-slate-900">
-            {source.request.company} — {source.request.job_title}
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            {source.request.company}
           </h1>
-          <div className="text-sm text-slate-500 mt-1">
-            {source.request.location ?? "—"} · {source.request.source_site ?? "—"}
-            {source.request.salary_offered && ` · ${source.request.salary_offered}`}
+          <div className="text-lg text-indigo-700 font-semibold mt-0.5">
+            {source.request.job_title}
+          </div>
+          <div className="text-sm text-slate-500 mt-2 flex flex-wrap items-center gap-2">
+            <span>📍 {source.request.location ?? "—"}</span>
+            <span className="text-slate-300">·</span>
+            <span>🌐 {source.request.source_site ?? "—"}</span>
+            {source.request.salary_offered && (
+              <>
+                <span className="text-slate-300">·</span>
+                <span>💰 {source.request.salary_offered}</span>
+              </>
+            )}
           </div>
         </div>
         <div className="text-right">
-          <div className="text-xs uppercase tracking-wide text-slate-500">Fit score</div>
-          <div className={`text-2xl font-semibold ${fitColor(source.tailored.fit_score)}`}>
+          <div className="text-xs uppercase tracking-wider font-semibold text-slate-500">
+            Fit score
+          </div>
+          <div className={`text-4xl font-bold ${fitColor(source.tailored.fit_score)}`}>
             {source.tailored.fit_score.toFixed(2)}
           </div>
         </div>
       </div>
 
       {warning && (
-        <div className="bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-md p-3">
-          {warning}
+        <div className="bg-amber-50 border border-amber-300 text-amber-900 text-base rounded-lg p-4 shadow-sm">
+          ⚠️ {warning}
         </div>
       )}
 
-      <div className="flex flex-wrap gap-1">
+      <div className="flex flex-wrap gap-1.5">
         {source.tailored.keywords.map((k) => (
           <span
             key={k}
-            className="text-xs px-2 py-0.5 bg-slate-100 text-slate-700 rounded-full"
+            className="text-sm px-3 py-1 bg-gradient-to-r from-indigo-100 to-violet-100 text-indigo-800 border border-indigo-200 rounded-full font-medium"
           >
             {k}
           </span>
@@ -168,22 +182,15 @@ export default function ReviewApplication() {
       </div>
 
       {source.tailored.changes_summary && (
-        <details className="bg-white border border-slate-200 rounded-md p-3 text-sm">
-          <summary className="cursor-pointer font-medium text-slate-700">
-            Changes summary
-          </summary>
-          <pre className="whitespace-pre-wrap text-xs text-slate-600 mt-2">
-            {source.tailored.changes_summary}
-          </pre>
-        </details>
+        <ChangesSummary markdown={source.tailored.changes_summary} />
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-white border border-slate-200 rounded-lg shadow-sm">
-          <div className="px-4 py-2 border-b border-slate-200 text-xs uppercase tracking-wide text-slate-600">
-            Job description
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-md">
+          <div className="px-4 py-2.5 border-b border-slate-200 text-sm uppercase tracking-wide text-slate-600 font-semibold bg-slate-50">
+            📋 Job description
           </div>
-          <pre className="whitespace-pre-wrap font-mono text-xs text-slate-700 p-4 max-h-[640px] overflow-y-auto">
+          <pre className="whitespace-pre-wrap font-mono text-sm text-slate-700 p-4 max-h-[640px] overflow-y-auto leading-relaxed">
             {source.request.job_description}
           </pre>
         </div>
@@ -194,29 +201,31 @@ export default function ReviewApplication() {
           editable
           onResumeChange={setResumeMd}
           onCoverChange={setCoverMd}
+          tab={tab}
+          onTabChange={setTab}
         />
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 justify-end">
+      <div className="flex flex-wrap items-center gap-3 justify-end bg-white/70 backdrop-blur rounded-xl p-4 border border-slate-200 shadow-sm">
         {!source.persistedId && (
           <>
             <button
               onClick={() => createMut.mutate("DRAFT")}
               disabled={createMut.isPending}
-              className="px-3 py-2 text-sm border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50"
+              className="px-4 py-2.5 text-base font-medium border border-slate-300 bg-white rounded-lg hover:bg-slate-50 disabled:opacity-50 transition"
             >
               Save as Draft
             </button>
             <button
               onClick={() => createMut.mutate("READY")}
               disabled={createMut.isPending}
-              className="px-3 py-2 text-sm bg-slate-900 text-white rounded-md hover:bg-slate-700 disabled:opacity-50"
+              className="px-5 py-2.5 text-base font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-lg shadow-md hover:shadow-lg disabled:opacity-50 transition"
             >
-              {createMut.isPending ? "Saving…" : "Save as Ready"}
+              {createMut.isPending ? "Saving…" : "✓ Save as Ready"}
             </button>
             <button
               onClick={() => navigate("/new")}
-              className="px-3 py-2 text-sm text-rose-600 hover:bg-rose-50 rounded-md"
+              className="px-4 py-2.5 text-base font-medium text-rose-600 hover:bg-rose-50 rounded-lg transition"
             >
               Discard
             </button>
@@ -232,21 +241,21 @@ export default function ReviewApplication() {
                 })
               }
               disabled={updateMut.isPending}
-              className="px-3 py-2 text-sm border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50"
+              className="px-4 py-2.5 text-base font-medium border border-slate-300 bg-white rounded-lg hover:bg-slate-50 disabled:opacity-50 transition"
             >
-              Save edits
+              💾 Save edits
             </button>
             <a
-              href={downloadUrl(source.persistedId, "docx", "resume")}
-              className="px-3 py-2 text-sm bg-slate-900 text-white rounded-md hover:bg-slate-700"
+              href={downloadUrl(source.persistedId, "docx", tab)}
+              className="px-5 py-2.5 text-base font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-lg shadow-md hover:shadow-lg transition"
             >
-              Download .docx
+              ⬇ {tab === "cover" ? "Download cover .docx" : "Download resume .docx"}
             </a>
             <a
-              href={downloadUrl(source.persistedId, "pdf", "resume")}
-              className="px-3 py-2 text-sm bg-slate-900 text-white rounded-md hover:bg-slate-700"
+              href={downloadUrl(source.persistedId, "pdf", tab)}
+              className="px-5 py-2.5 text-base font-semibold bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white rounded-lg shadow-md hover:shadow-lg transition"
             >
-              Download .pdf
+              ⬇ {tab === "cover" ? "Download cover .pdf" : "Download resume .pdf"}
             </a>
           </>
         )}

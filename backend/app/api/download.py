@@ -50,12 +50,14 @@ def _candidate_name_from_resume() -> str:
 
 
 def _build_filename(app: Application, kind: str) -> str:
-    parts = [
-        _safe_filename(_candidate_name_from_resume()),
-        _safe_filename(app.company),
-        _safe_filename(app.job_title),
-        kind,
-    ]
+    name = _safe_filename(_candidate_name_from_resume())
+    company = _safe_filename(app.company)
+    if kind == "cover":
+        # Pratibha_Jadhav_Cover_Letter_CompanyName
+        parts = [name, "Cover_Letter", company]
+    else:
+        # Pratibha_Jadhav_CompanyName_JobTitle_resume
+        parts = [name, company, _safe_filename(app.job_title), "resume"]
     return "_".join(p for p in parts if p) or f"application_{app.id}_{kind}"
 
 
@@ -78,9 +80,15 @@ def download_application(
 
     if format == "docx":
         template = _template_for(kind)
+        photo = ASSETS_DIR / "profile.png" if kind == "resume" else None
         try:
             if template:
-                data = markdown_to_docx_with_template(md, template)
+                data = markdown_to_docx_with_template(
+                    md,
+                    template,
+                    photo_path=photo if photo and photo.exists() else None,
+                    mode=kind,
+                )
             else:
                 data = markdown_to_docx_bytes(md)
         except Exception as e:  # noqa: BLE001

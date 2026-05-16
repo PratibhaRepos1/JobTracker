@@ -19,19 +19,22 @@ export default function NewApplication() {
   });
 
   return (
-    <div className="space-y-4 max-w-4xl">
-      <h1 className="text-xl font-semibold text-slate-900">New application</h1>
-      <p className="text-sm text-slate-600">
-        Paste the JD, click <strong>Auto-fill</strong> to populate company/title/location/salary
-        (fast, ~2s), edit anything that's wrong, then <strong>Tailor</strong> to generate a
-        resume + cover letter (~15–20s).
-      </p>
+    <div className="space-y-6 max-w-4xl">
+      <div>
+        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">New application</h1>
+        <p className="text-base text-slate-600 mt-2">
+          Paste the JD, click <strong className="text-indigo-700">Auto-fill</strong> to populate
+          company/title/location/salary (~2s), edit anything that's wrong, then{" "}
+          <strong className="text-indigo-700">Tailor</strong> to generate a resume + cover letter
+          (~15–20s).
+        </p>
+      </div>
 
       <JobPasteForm onSubmit={(req) => mut.mutate(req)} loading={mut.isPending} />
 
       {mut.isError && (
-        <div className="bg-rose-50 border border-rose-200 text-rose-700 text-sm rounded-md p-3">
-          Tailoring failed: {(mut.error as Error).message}
+        <div className="bg-rose-50 border border-rose-300 text-rose-800 text-base rounded-lg p-4 shadow-sm">
+          <strong>Tailoring failed:</strong> {(mut.error as Error).message}
         </div>
       )}
     </div>

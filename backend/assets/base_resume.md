@@ -1,8 +1,8 @@
 # Pratibha Jadhav
 
 Senior Angular & AI Developer
-Bangkok, Thailand | +66 095 254 0142 | +91 97659 60110 | pratibhajobs10@gmail.com
-linkedin.com/in/pratibha-jadhav | github.com/PratibhaRepos1 | Portfolio
+Bangkok, Thailand | +66 095 254 0142 | +91 97659 60110 | [pratibhajobs10@gmail.com](mailto:pratibhajobs10@gmail.com)
+[linkedin.com/in/pratibha-jadhav](https://linkedin.com/in/pratibha-jadhav) | [github.com/PratibhaRepos1](https://github.com/PratibhaRepos1) | [Portfolio](https://pratibharepos1.github.io/crafted-by-pratibha/)
 
 ## Professional Summary
 

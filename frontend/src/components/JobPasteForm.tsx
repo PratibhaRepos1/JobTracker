@@ -21,7 +21,6 @@ export default function JobPasteForm({ onSubmit, loading }: Props) {
   const autofill = useMutation({
     mutationFn: () => extractMeta(jd),
     onSuccess: (data) => {
-      // Only fill empty fields by default so we don't overwrite anything the user typed.
       if (data.company && !company) setCompany(data.company);
       if (data.job_title && !jobTitle) setJobTitle(data.job_title);
       if (data.location && !location) setLocation(data.location);
@@ -47,23 +46,22 @@ export default function JobPasteForm({ onSubmit, loading }: Props) {
   }
 
   const inputCls =
-    "w-full px-3 py-2 border border-slate-300 rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent";
+    "w-full px-4 py-2.5 border border-slate-300 rounded-lg bg-white text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition";
+  const labelCls = "block text-sm font-semibold text-slate-700 mb-1.5";
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm space-y-4"
+      className="bg-white border border-slate-200 rounded-xl p-7 shadow-md space-y-5"
     >
       <div>
-        <div className="flex items-center justify-between mb-1">
-          <label className="block text-xs font-medium text-slate-600">
-            Job description *
-          </label>
+        <div className="flex items-center justify-between mb-1.5">
+          <label className={labelCls + " mb-0"}>Job description *</label>
           <button
             type="button"
             onClick={() => autofill.mutate()}
             disabled={!canAutofill}
-            className="text-xs px-2 py-1 rounded bg-blue-50 text-blue-700 hover:bg-blue-100 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="text-sm font-semibold px-3 py-1.5 rounded-lg bg-gradient-to-r from-indigo-100 to-violet-100 text-indigo-700 hover:from-indigo-200 hover:to-violet-200 disabled:opacity-40 disabled:cursor-not-allowed transition"
           >
             {autofill.isPending ? "Reading JD…" : "✨ Auto-fill fields from JD"}
           </button>
@@ -72,11 +70,11 @@ export default function JobPasteForm({ onSubmit, loading }: Props) {
           value={jd}
           onChange={(e) => setJd(e.target.value)}
           rows={12}
-          className={inputCls + " font-mono text-xs leading-relaxed"}
+          className={inputCls + " font-mono text-sm leading-relaxed"}
           placeholder="Paste the full JD here, then click Auto-fill to populate company / title / location / salary."
           required
         />
-        <div className="text-xs text-slate-400 mt-1 flex items-center justify-between">
+        <div className="text-sm text-slate-400 mt-1.5 flex items-center justify-between">
           <span>{jd.length} chars</span>
           {autofill.isError && (
             <span className="text-rose-600">
@@ -84,16 +82,16 @@ export default function JobPasteForm({ onSubmit, loading }: Props) {
             </span>
           )}
           {autofill.isSuccess && (
-            <span className="text-emerald-600">
-              Filled empty fields. Review/edit anything below.
+            <span className="text-emerald-600 font-medium">
+              ✓ Filled empty fields. Review/edit anything below.
             </span>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Company *</label>
+          <label className={labelCls}>Company *</label>
           <input
             value={company}
             onChange={(e) => setCompany(e.target.value)}
@@ -103,7 +101,7 @@ export default function JobPasteForm({ onSubmit, loading }: Props) {
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Job title *</label>
+          <label className={labelCls}>Job title *</label>
           <input
             value={jobTitle}
             onChange={(e) => setJobTitle(e.target.value)}
@@ -113,7 +111,7 @@ export default function JobPasteForm({ onSubmit, loading }: Props) {
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Source site</label>
+          <label className={labelCls}>Source site</label>
           <select
             value={sourceSite}
             onChange={(e) => setSourceSite(e.target.value)}
@@ -127,7 +125,7 @@ export default function JobPasteForm({ onSubmit, loading }: Props) {
           </select>
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Source URL</label>
+          <label className={labelCls}>Source URL</label>
           <input
             value={sourceUrl}
             onChange={(e) => setSourceUrl(e.target.value)}
@@ -136,7 +134,7 @@ export default function JobPasteForm({ onSubmit, loading }: Props) {
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Location</label>
+          <label className={labelCls}>Location</label>
           <input
             value={location}
             onChange={(e) => setLocation(e.target.value)}
@@ -145,7 +143,7 @@ export default function JobPasteForm({ onSubmit, loading }: Props) {
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Salary</label>
+          <label className={labelCls}>Salary</label>
           <input
             value={salary}
             onChange={(e) => setSalary(e.target.value)}
@@ -155,13 +153,13 @@ export default function JobPasteForm({ onSubmit, loading }: Props) {
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-3">
+      <div className="flex items-center justify-end gap-3 pt-2">
         <button
           type="submit"
           disabled={!canSubmit || loading}
-          className="px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-md hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-base font-semibold rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition"
         >
-          {loading ? "Tailoring… (~15-20s)" : "Tailor resume + cover"}
+          {loading ? "✨ Tailoring… (~15-20s)" : "✨ Tailor resume + cover"}
         </button>
       </div>
     </form>

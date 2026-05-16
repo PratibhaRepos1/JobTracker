@@ -1,4 +1,4 @@
-import { useState } from "react";
+export type TailoredTab = "resume" | "cover";
 
 interface Props {
   resumeMd: string;
@@ -6,9 +6,9 @@ interface Props {
   onResumeChange?: (v: string) => void;
   onCoverChange?: (v: string) => void;
   editable?: boolean;
+  tab: TailoredTab;
+  onTabChange: (t: TailoredTab) => void;
 }
-
-type Tab = "resume" | "cover";
 
 export default function TailoredPreview({
   resumeMd,
@@ -16,31 +16,24 @@ export default function TailoredPreview({
   onResumeChange,
   onCoverChange,
   editable = false,
+  tab,
+  onTabChange,
 }: Props) {
-  const [tab, setTab] = useState<Tab>("resume");
+  const tabCls = (active: boolean) =>
+    `px-5 py-3 text-base font-semibold transition ${
+      active
+        ? "text-indigo-700 border-b-2 border-indigo-600 bg-indigo-50/40"
+        : "text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/20"
+    }`;
 
   return (
-    <div className="bg-white border border-slate-200 rounded-lg shadow-sm flex flex-col">
+    <div className="bg-white border border-slate-200 rounded-xl shadow-md flex flex-col">
       <div className="border-b border-slate-200 flex">
-        <button
-          onClick={() => setTab("resume")}
-          className={`px-4 py-2 text-sm font-medium ${
-            tab === "resume"
-              ? "text-slate-900 border-b-2 border-slate-900"
-              : "text-slate-500 hover:text-slate-700"
-          }`}
-        >
-          Resume
+        <button onClick={() => onTabChange("resume")} className={tabCls(tab === "resume")}>
+          📄 Resume
         </button>
-        <button
-          onClick={() => setTab("cover")}
-          className={`px-4 py-2 text-sm font-medium ${
-            tab === "cover"
-              ? "text-slate-900 border-b-2 border-slate-900"
-              : "text-slate-500 hover:text-slate-700"
-          }`}
-        >
-          Cover letter
+        <button onClick={() => onTabChange("cover")} className={tabCls(tab === "cover")}>
+          ✉️ Cover letter
         </button>
       </div>
 
@@ -53,10 +46,10 @@ export default function TailoredPreview({
                 ? onResumeChange?.(e.target.value)
                 : onCoverChange?.(e.target.value)
             }
-            className="w-full h-[600px] font-mono text-xs leading-relaxed border border-slate-200 rounded p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full h-[600px] font-mono text-sm leading-relaxed border border-slate-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         ) : (
-          <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-slate-800 max-h-[600px] overflow-y-auto">
+          <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed text-slate-800 max-h-[600px] overflow-y-auto">
             {tab === "resume" ? resumeMd : coverMd}
           </pre>
         )}

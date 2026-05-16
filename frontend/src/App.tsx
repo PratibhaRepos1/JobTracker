@@ -7,18 +7,23 @@ import ReviewApplication from "./pages/ReviewApplication";
 export default function App() {
   return (
     <div className="min-h-screen">
-      <header className="bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
-          <Link to="/" className="text-lg font-semibold text-slate-900">
-            Job Tracker
+      <header className="bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 shadow-lg">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2 group">
+            <span className="text-3xl">✨</span>
+            <span className="text-2xl font-bold tracking-tight text-white group-hover:text-indigo-100 transition">
+              Job Tracker
+            </span>
           </Link>
-          <nav className="flex items-center gap-1 text-sm">
+          <nav className="flex items-center gap-2 text-base">
             <NavLink
               to="/"
               end
               className={({ isActive }) =>
-                `px-3 py-1.5 rounded-md ${
-                  isActive ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-100"
+                `px-4 py-2 rounded-lg font-medium transition ${
+                  isActive
+                    ? "bg-white text-indigo-700 shadow-md"
+                    : "text-white/90 hover:bg-white/15"
                 }`
               }
             >
@@ -27,18 +32,20 @@ export default function App() {
             <NavLink
               to="/new"
               className={({ isActive }) =>
-                `px-3 py-1.5 rounded-md ${
-                  isActive ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-100"
+                `px-4 py-2 rounded-lg font-medium transition ${
+                  isActive
+                    ? "bg-white text-indigo-700 shadow-md"
+                    : "text-white/90 hover:bg-white/15"
                 }`
               }
             >
-              New application
+              + New application
             </NavLink>
           </nav>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-6">
+      <main className="max-w-7xl mx-auto px-6 py-8">
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/new" element={<NewApplication />} />

@@ -16,6 +16,7 @@ from pathlib import Path
 
 from docx import Document
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx.oxml.ns import qn
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 ASSETS_DIR = BACKEND_DIR / "assets"
@@ -38,18 +39,39 @@ def _wrap(text: str, marker: str) -> str:
     return f"{leading}{marker}{core}{marker}{trailing}"
 
 
+def _run_text_with_marks(run_elem) -> str:
+    """Extract plain text from a w:r element and wrap with **/* based on its rPr."""
+    text = "".join(t.text or "" for t in run_elem.iter(qn("w:t")))
+    if not text:
+        return ""
+    rPr = run_elem.find(qn("w:rPr"))
+    bold = rPr is not None and rPr.find(qn("w:b")) is not None
+    italic = rPr is not None and rPr.find(qn("w:i")) is not None
+    if bold:
+        text = _wrap(text, "**")
+    elif italic:
+        text = _wrap(text, "*")
+    return text
+
+
 def _inline_md(paragraph) -> str:
-    """Render a paragraph's runs as markdown with **bold** / *italic*, dropping images."""
+    """Render paragraph content as markdown, preserving hyperlinks as [text](url) and
+    bold/italic. Walks direct children in document order so the interleaving of plain
+    runs and hyperlinks is preserved."""
+    rels = paragraph.part.rels
     out: list[str] = []
-    for r in paragraph.runs:
-        text = r.text
-        if not text:
-            continue
-        if r.bold:
-            text = _wrap(text, "**")
-        elif r.italic:
-            text = _wrap(text, "*")
-        out.append(text)
+    for child in paragraph._element.iterchildren():
+        tag = child.tag
+        if tag == qn("w:r"):
+            out.append(_run_text_with_marks(child))
+        elif tag == qn("w:hyperlink"):
+            r_id = child.get(qn("r:id"))
+            url = rels[r_id].target_ref if r_id and r_id in rels else ""
+            link_text = "".join(t.text or "" for t in child.iter(qn("w:t")))
+            if not link_text:
+                continue
+            out.append(f"[{link_text}]({url})" if url else link_text)
+        # everything else (w:bookmarkStart, w:proofErr, ...) is skipped
     return "".join(out).strip()
 
 
